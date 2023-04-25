@@ -1,0 +1,43 @@
+// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel GameOfLife
+
+// Create a RenderTexture with enableRandomWrite flag and set it
+// with cs.SetTexture
+RWTexture2D<float4> Result;
+int TextureSize;
+
+[numthreads(8,8,1)]
+void GameOfLife (uint3 id : SV_DispatchThreadID)
+{
+    float4 pixel = Result[id.xy];
+    int aliveCount = 0;
+
+    // check neighbors
+    for (int x = -1; x <= 1; x++)
+    {
+        for (int y = -1; y <= 1; y++)
+        {
+            if (x == 0 && y == 0) continue;
+
+            int2 neighbor = int2(id.x + x, id.y + y);
+
+            if (neighbor.x < 0 || neighbor.x >= TextureSize ||
+                neighbor.y < 0 || neighbor.y >= TextureSize) continue;
+
+            float4 neighborPixel = Result[neighbor];
+
+            if (neighborPixel.x > 0.5f) aliveCount++;
+        }
+    }
+    
+    // apply Game of Life rules
+    if (pixel.x > 0.5f)
+    {
+        if (aliveCount < 2 || aliveCount > 3) Result[id.xy] = float4(0, 0, 0, 1);
+    }
+    else
+    {
+        if (aliveCount == 3) Result[id.xy] = float4(1, 1, 1, 1);
+        else Result[id.xy] = float4(0, 0, 0, 1);
+    }
+}
