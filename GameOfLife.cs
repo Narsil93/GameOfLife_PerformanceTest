@@ -2,6 +2,7 @@ using System;
 using UnityEngine;
 using System.Diagnostics;
 using TMPro;
+using System.Threading.Tasks;
 
 public class GameOfLife : MonoBehaviour
 {
@@ -36,7 +37,7 @@ public class GameOfLife : MonoBehaviour
         if (timer >= updateInterval && run)
         {
             timer = 0f;
-            UpdateCells();
+            UpdateCellsParallel();
             UpdateTexture();
         }
         else
@@ -44,24 +45,15 @@ public class GameOfLife : MonoBehaviour
             timer += Time.deltaTime;
         }
     }
-/*
-    private void Awake()
-    {
-        if (texture == null)
-        {
-            texture = GetComponent<MeshRenderer>().material.mainTexture as Texture2D;
-        }
-    }
-    */
 
-    private void UpdateCells()
+    private void UpdateCellsParallel()
     {
         // copy new cells
         bool[] newCells = new bool[cells.Length];
         cells.CopyTo(newCells, 0);
 
-        // apply Game of Life rules
-        for (int x = 0; x < textureSize; x++)
+        // apply Game of Life rules with multi-threading
+        Parallel.For(0, textureSize, x =>
         {
             for (int y = 0; y < textureSize; y++)
             {
@@ -83,7 +75,7 @@ public class GameOfLife : MonoBehaviour
                     }
                 }
             }
-        }
+        });
 
         // update cells
         cells = newCells;
@@ -139,7 +131,7 @@ public class GameOfLife : MonoBehaviour
         sw.Start();
         for (int i = 0; i < numIterations; i++)
         {
-            UpdateCells();
+            UpdateCellsParallel();
             UpdateTexture();
         }
         sw.Stop();
