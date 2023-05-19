@@ -37,8 +37,8 @@ public class GameOfLife : MonoBehaviour
         if (timer >= updateInterval && run)
         {
             timer = 0f;
-            UpdateCellsParallel();
-            UpdateTexture();
+            updateCellsParallel();
+            updateTexture();
         }
         else
         {
@@ -46,7 +46,7 @@ public class GameOfLife : MonoBehaviour
         }
     }
 
-    private void UpdateCellsParallel()
+    private void updateCellsParallel()
     {
         // copy new cells
         bool[] newCells = new bool[cells.Length];
@@ -58,7 +58,7 @@ public class GameOfLife : MonoBehaviour
             for (int y = 0; y < textureSize; y++)
             {
                 int index = x * textureSize + y;
-                int neighbors = CountNeighbors(x, y);
+                int neighbors = countNeighbors(x, y);
 
                 if (cells[index])
                 {
@@ -81,7 +81,7 @@ public class GameOfLife : MonoBehaviour
         cells = newCells;
     }
 
-    private int CountNeighbors(int x, int y)
+    private int countNeighbors(int x, int y)
     {
         int count = 0;
         for (int i = x - 1; i <= x + 1; i++)
@@ -101,7 +101,7 @@ public class GameOfLife : MonoBehaviour
         return count;
     }
 
-    private void UpdateTexture()
+    private void updateTexture()
     {
         // update color-array based on cells
         for (int x = 0; x < textureSize; x++)
@@ -131,8 +131,8 @@ public class GameOfLife : MonoBehaviour
         sw.Start();
         for (int i = 0; i < numIterations; i++)
         {
-            UpdateCellsParallel();
-            UpdateTexture();
+            updateCellsParallel();
+            updateTexture();
         }
         sw.Stop();
 
